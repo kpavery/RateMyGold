@@ -188,7 +188,14 @@ function openPopup() {
 					    clarityTextDiv.innerText      = clarity.innerHTML;
 					    easinessTitleDiv.innerText    = 'Easiness';
 					    easinessTextDiv.innerText     = easiness.innerHTML;
-              numRatingsDiv.innerText       = numRatings;
+
+              numRatings = numRatings.slice(9).split(' ')[0] //check to see if "ratings" is singular or plural
+              if (numRatings == '1'){
+                numRatingsDiv.innerText     = numRatings + " rating";
+              }
+              else{
+                numRatingsDiv.innerText     = numRatings + " ratings";
+              }
 
 					    //add divs to popup
 					    popup.innerHTML = ''; //remove 'loading...' text
