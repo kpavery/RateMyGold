@@ -87,7 +87,7 @@
     position: absolute;
     width: 105px;
     height: 20px;
-    top: 22px;
+    top: 30px;
     left: 5px;
 }
 
@@ -96,7 +96,7 @@
     position: absolute;
     width: 105px;
     height: 20px;
-    top: 22px;
+    top: 30px;
     left: 110px; 
 }
 
@@ -105,7 +105,7 @@
     position: absolute;
     width: 70px;
     height: 20px;
-    top: 60px;
+    top: 65px;
     left: 4px;
 }
 
@@ -114,7 +114,7 @@
     position: absolute;
     width: 70px;
     height: 20px;
-    top: 60px;
+    top: 65px;
     left: 85px;
 }
 
@@ -123,18 +123,21 @@
     position: absolute;
     width: 70px;
     height: 20px;
-    top: 60px;
+    top: 65px;
     left: 143px;
 }
 
 .numRatings {
-    display: block;
+    /*display: block;*/
+    width: 210px;
+    height: 5px;
     position: absolute;
-    width: 120px;
-    height: 20px;
-    top: 80px;
-    left: 60px;
     font-family: verdana;
+    font-size: 9px;
+    color: #003366;
+    text-align: center;
+    text-transform: lowercase;
+    top: 2px;
 }
 
 .idk {
