@@ -113,6 +113,7 @@ function openPopup() {
    					  var proffName	    = tmp.getElementsByClassName('pfname')[0].innerText;
    					  var proflName	    = tmp.getElementsByClassName('plname')[0].innerText;
    					  var ratingInfo    = tmp.getElementsByClassName('left-breakdown')[0];
+              var numRatings    = tmp.getElementsByClassName('table-toggle rating-count active')[0].innerText;
    					  tmp.innerHTML     = ratingInfo.innerHTML;
 
    					  //get the raw rating data
@@ -153,6 +154,8 @@ function openPopup() {
               var easinessDiv         = document.createElement('div');
               var easinessTitleDiv    = document.createElement('div');
               var easinessTextDiv     = document.createElement('div');
+              var numRatingsDiv       = document.createElement('div');
+
 
               //assign class names for styling
               profNameDiv.className         = 'heading';
@@ -171,6 +174,7 @@ function openPopup() {
               easinessDiv.className         = 'easiness';
               easinessTitleDiv.className    = 'title';
               easinessTextDiv.className     = 'text';
+              numRatingsDiv.className       = 'numRatings';
 
               //put rating data in divs
               profNameDiv.innerHTML         = '<a href="'+ this.profURL + '" target="_blank">'+ proffName + " " + proflName; + '</a>';
@@ -184,6 +188,7 @@ function openPopup() {
 					    clarityTextDiv.innerText      = clarity.innerHTML;
 					    easinessTitleDiv.innerText    = 'Easiness';
 					    easinessTextDiv.innerText     = easiness.innerHTML;
+              numRatingsDiv.innerText       = numRatings;
 
 					    //add divs to popup
 					    popup.innerHTML = ''; //remove 'loading...' text
@@ -205,6 +210,7 @@ function openPopup() {
    					  popup.appendChild(helpfulnessDiv);
    					  popup.appendChild(clarityDiv);
    					  popup.appendChild(easinessDiv);
+              popup.appendChild(numRatingsDiv);
 
 				}); //end message
 			}    //end else
