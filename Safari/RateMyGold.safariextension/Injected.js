@@ -5,15 +5,38 @@ var professors = [];
 var profCount  = 0;
 var popup;
 var firstName;
+var department;
+var number;
+var name;
+var courses    = [];
 
 // Loop through to add buttons below professor names
 
 if (document.URL == "https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx") {
+	var spans = document.getElementsByTagName("span");
+	for (var i = 0; i < spans.length; i++) {
+		var span = spans[i];
+		if (span.className == "tableheader") {
+			var parent = span;
+			for (var j = 0; j < 13; j++)
+				parent = parent.parentNode;
+			var split = span.innerHTML.split(/\s+/)
+			courses.push({"department": split[0], "number": split[1], "parent": parent});
+		}
+	}
 
-	for (var i = 3; i < length; i += 18) {                   //only iterate through cells which contain a professor name	
+	for (var i = 3; i < length; i += 18) {                   //only iterate through cells which contain a professor name
 		var profName = cells[i].innerText.slice(0,-1);        //slice '&nbsp;'' character		
-		console.log(i);
 		if (profName != 'T.B.A.' && profName != 'Cancel'){
+			var parent = cells[i];
+			for (var j = 0; j < 11; j++)
+				parent = parent.parentNode;
+			for (var j = 0; j < courses.length; j++) {
+				if (courses[j].parent == parent) {
+					department = courses[j].department;
+					number = courses[j].number;
+				}
+			}
 		    professors.push(profName.slice(0,-1));               //slice remaining space at end & push to professor array
 		    var div         = cells[i+9];                        //cell where the button will go
 		    var searchName  = '';
@@ -31,6 +54,9 @@ if (document.URL == "https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx") {
 		    
 		    div.searchURL = 'http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=university+of+california+santa+barbara&queryoption=HEADER&query='
 	                + searchName + '&facetSearch=true';
+	        div.department = department;
+	        div.number     = number;
+	        div.lastName   = searchName;
 		    div.profURL   = '';
 		    div.innerHTML = '<input class="ratingButton" type="button" value="SHOW RATING" />';
 		    div.cell      = cells[i+10];                          //cell where the popup's html will be placed
@@ -48,20 +74,111 @@ function openPopup() {
 		this.innerHTML      = '<input class="ratingButton" type="button" value="SHOW RATING" />';
 		this.clicked        = false;
     } else {                                                  //happens when button was clicked while inactive
-
+		name = this.lastName + " " + this.firstName;
 		this.clicked    = true;
-		this.innerHTML  = '<input class="ratingButton" type="button" value="HIDE RATING" />';	
+		this.innerHTML  = '<input class="ratingButton" type="button" value="HIDE RATING" />';
 		popup       = document.createElement('div');
 		popup.className = 'popup';
+		popup.id = name;
 		popup.innerText = 'Loading...';
 		firstName   = this.firstName;
 		this.cell.style.position = 'relative';
 		this.cell.appendChild(popup);
+		department = this.department;
+		number = this.number;
 		var dataArray = [this.searchURL, "parseSearchResponseHTML"];
 		safari.self.tab.dispatchMessage("parseSearchResponseHTML", dataArray); //end message
+		var secondDataArray = ["https://www.myedu.com/UCSB-University-of-California-Santa-Barbara/school/255/course/by-department/",
+		                       "parseMyEduSchoolResponseHTML"];
+		safari.self.tab.dispatchMessage("parseMyEduSchoolResponseHTML", secondDataArray);
 	} //end else
 } //end openPopup()
 
+function parseMyEduSchoolResponseHTML(messageEvent) {
+	if (messageEvent.name == "parseMyEduSchoolResponseHTML") {
+		var responseText = messageEvent.message;
+		var regexp = /<a class="abbreviation" href="(.*)">\s+(.*)\s+<\/a>/g;
+		var match = regexp.exec(responseText);
+		var foundlink;
+		while (match != null) {
+			if (match[2] == department) {
+				foundlink = "https://www.myedu.com" + match[1];
+			}
+			match = regexp.exec(responseText);
+		}
+		var dataArray = [foundlink, "parseMyEduDepartmentResponseHTML"];
+		safari.self.tab.dispatchMessage("parseMyEduDepartmentResponseHTML", dataArray);
+	}
+}
+
+function parseMyEduDepartmentResponseHTML(messageEvent) {
+	if (messageEvent.name == "parseMyEduDepartmentResponseHTML") {
+		var responseText = messageEvent.message;
+		var regexp = /<a class="abbreviation" href="(.*)">\s+(.*)\s+<\/a>/g;
+		var match = regexp.exec(responseText);
+		var foundlink;
+		while (match != null) {
+			if (match[2] == number) {
+				foundlink = "https://www.myedu.com" + match[1];
+			}
+			match = regexp.exec(responseText);
+		}
+		var dataArray = [foundlink, "parseMyEduCourseResponseHTML"];
+		safari.self.tab.dispatchMessage("parseMyEduCourseResponseHTML", dataArray);
+	}
+}
+
+function parseMyEduCourseResponseHTML(messageEvent) {
+	if (messageEvent.name == "parseMyEduCourseResponseHTML") {
+		var responseText = messageEvent.message;
+		var regexp = /<tbody id=\"[a-z0-9\-]+\" class=\"list\"\s+data-w=\"(.*)\"\s+data-gpa=\"(.*)\"\s+data-past_year=\"(.*)\"\s+data-recs=\"(.*)\"\s+data-name=\"(.*)\"\s+shown=\"(.*)\"\s+>/g;
+		var match = regexp.exec(responseText);
+		var gpa;
+		var count = 0;
+		while (match != null) {
+			if (match[5].toLowerCase() == name.toLowerCase()) {
+				gpa = match[2];
+				break;
+			}
+			count++;
+			match = regexp.exec(responseText);
+		}
+		regexp = /<img lsrc=\"(.*)\"\s+alt=\".*\"\s+class=\"chart detail\"\s+\/>/g;
+		match = regexp.exec(responseText);
+		var image;
+		var i = 0;
+		while (match != null) {
+			if (i == count) { 
+				image = match[1];
+				break;
+			}
+			i++
+			match = regexp.exec(responseText);
+		}
+		if (gpa) {
+			popup.style.height = "225px";
+			popup.style.width = "330px";
+			var gpaDiv = document.createElement('div');
+			var gpaTitleDiv = document.createElement('div');
+			var gpaTextDiv = document.createElement('div');
+			gpaDiv.className = 'gpa';
+			gpaTitleDiv.className = 'title';
+			gpaTextDiv.className = 'text';
+			gpaTitleDiv.innerText = 'GPA';
+			gpaTextDiv.innerText = gpa;
+			gpaTitleDiv.appendChild(gpaTextDiv);
+			gpaDiv.appendChild(gpaTitleDiv);
+			popup.appendChild(gpaDiv);
+			if (image) {
+				var gpaImageDiv = document.createElement('div');
+				gpaImageDiv.innerHTML = "<img src=\"" + image + "\" />";
+				gpaImageDiv.className = "gpaimage";
+				popup.appendChild(gpaImageDiv);
+			}
+			var popups = document.getElementsByClassName("popup");
+		}
+	}
+}
 
 // Called as the callback of the request to search RateMyProfessor
 function parseSearchResponseHTML(messageEvent) {
@@ -232,10 +349,8 @@ function parseProfessorResponseHTML(messageEvent) {
 	 }
 }
 
+safari.self.addEventListener("message", parseMyEduSchoolResponseHTML, false);
+safari.self.addEventListener("message", parseMyEduDepartmentResponseHTML, false);
+safari.self.addEventListener("message", parseMyEduCourseResponseHTML, false);
 safari.self.addEventListener("message", parseProfessorResponseHTML, false);
 safari.self.addEventListener("message", parseSearchResponseHTML, false);
-
-
-
-
-
