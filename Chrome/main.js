@@ -11,7 +11,8 @@ function main() {
 	
 	for (var i = 3; i < length; i += 18) {                   //only iterate through cells which contain a professor name	
 		var profName = cells[i].innerText.slice(0,-1);         //slice '&nbsp;'' character		
-		if (profName != 'T.B.A.' && profName != 'Cancel'){
+		
+    if (profName != 'T.B.A.' && profName != 'Cancel'){
 		  professors.push(profName.slice(0,-1));               //slice remaining space at end & push to professor array
 			var div         = cells[i+9];                        //cell where the button will go
 			var searchName  = '';
@@ -22,7 +23,7 @@ function main() {
 			}
 			else if (nameArray[1].length > 1){ 
 				searchName    = nameArray[0] + ' ' + nameArray[1];
-        if (nameArray.length == 2){
+        if (nameArray.length == 2){                        //when first name isnt provided, make it blank and check it later
           div.firstName = ' ';
         } 
         else{
@@ -65,7 +66,8 @@ function openPopup() {
 		chrome.runtime.sendMessage({                          //need a separate event page to do the xmlhttprequest because of http to https issue
     		url: this.searchURL,
 		}, function(responseText) {
-			var tmp          = document.createElement('div');  //make a temp element so that we can search through its html
+			  
+        var tmp        = document.createElement('div');  //make a temp element so that we can search through its html
    			tmp.innerHTML  = responseText;
    			var foundProfs = tmp.getElementsByClassName('listing PROFESSOR'); 
    			
@@ -118,7 +120,7 @@ function openPopup() {
    					  var proffName	    = tmp.getElementsByClassName('pfname')[0].innerText;
    					  var proflName	    = tmp.getElementsByClassName('plname')[0].innerText;
    					  var ratingInfo    = tmp.getElementsByClassName('left-breakdown')[0];
-                      var numRatings    = tmp.getElementsByClassName('table-toggle rating-count active')[0].innerText;
+              var numRatings    = tmp.getElementsByClassName('table-toggle rating-count active')[0].innerText;
    					  tmp.innerHTML     = ratingInfo.innerHTML;
 
    					  //get the raw rating data
