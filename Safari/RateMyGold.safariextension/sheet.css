@@ -34,6 +34,10 @@
     z-index: 100000000000000000;
 }
 
+.popup div {
+    padding: none !important;
+}
+
 .notFoundPopup {
     position: absolute;
     top: -141px;
@@ -56,7 +60,7 @@
     text-decoration: underline;
     color: #003366;
     position: absolute;
-    width: 210px;
+    width: 100%;
     height: 10px;
     text-align: center;
     padding: 1px 0px 6px 0px; 
@@ -68,12 +72,15 @@
 
 .title {
     display: block;
+    width: 100%;
     font-family: verdana;
     font-size: 10px;
     font-weight: 600;
     color: #003366;
     position: relative;
     text-align: center;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
 }
 
 .text {
@@ -86,51 +93,51 @@
 .overall {
     display: block;
     position: absolute;
-    width: 105px;
+    width: 50%;
     height: 20px;
     top: 30px;
-    left: 5px;
+    left: 0%;
 }
 
 .avgGrade {
     display: block;
     position: absolute;
-    width: 105px;
+    width: 50%;
     height: 20px;
     top: 30px;
-    left: 110px; 
+    left: 50%; 
 }
 
 .helpfulness {
     display: block;
     position: absolute;
-    width: 70px;
+    width: 33%;
     height: 20px;
     top: 65px;
-    left: 4px;
+    left: 3%;
 }
 
 .clarity {
     display: block;
     position: absolute;
-    width: 70px;
+    width: 33%;
     height: 20px;
     top: 65px;
-    left: 85px;
+    left: 33%;
 }
 
 .easiness {
     display: block;
     position: absolute;
-    width: 70px;
+    width: 33%;
     height: 20px;
     top: 65px;
-    left: 143px;
+    left: 66%;
 }
 
 .numRatings {
     /*display: block;*/
-    width: 210px;
+    width: 100%;
     height: 5px;
     position: absolute;
     font-family: verdana;
@@ -143,7 +150,36 @@
 }
 
 .numRatings a:hover {
-    color: blue;
+    color: blue !important;
+}
+
+.gpa {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 20px;
+    top: 100px;
+    left: 0%;
+    border-top: 1px solid #D6D6D6;
+}
+
+.gpa a {
+    color: #003366 !important;
+    text-decoration: underline !important;
+}
+
+
+.gpa a:hover {
+    color: blue !important;
+}
+
+.gpaimage {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    top: 130px;
+    left: 0%;
 }
 
 .idk {
@@ -151,8 +187,8 @@
     font-family: verdana;
     font-size: 11px;
     position: absolute;
-    width: 210px;
+    width: 100%;
     height: 25px;
     top: 25px;
     text-align: center;
-} 
+}
