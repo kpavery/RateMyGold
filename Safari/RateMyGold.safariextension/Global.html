@@ -1,0 +1,45 @@
+/* RateMyGold                                                                              */
+/* -Choose your UCSB courses more efficiently with ratings from RateMyProfessors.com-      */
+/* Jan.31.2015                                                                             */
+
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>global HTML page</title>
+<script type="text/javascript">
+
+
+function executeRequest(messageEvent) {
+	
+	var messageData = messageEvent.message;
+	var url = messageData[0];
+
+	var parseAction = messageData[1]; // "parseSearchResponseHTML" OR "parseProfessorResponseHTML"
+
+	var xhr = new XMLHttpRequest();
+
+	xhr.onload = function() {
+		safari.application.activeBrowserWindow.activeTab.page.dispatchMessage(parseAction, xhr.responseText); 
+    };
+	xhr.onerror = function() {
+		safari.application.activeBrowserWindow.activeTab.page.dispatchMessage(parseAction); 
+ 	};
+ 	
+  	xhr.open('GET', url, true);
+   	xhr.send();
+   	return true; // prevents the callback from being called too early on return   
+}
+
+safari.application.addEventListener("message", executeRequest, false);
+
+
+
+									      
+</script>
+</head>
+<body>
+</body>
+</html>
+
+
+
