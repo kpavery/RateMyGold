@@ -1,0 +1,139 @@
+.ratingButton {
+    background-color:#DCE8FF;
+    -moz-border-radius:28px;
+    -webkit-border-radius:28px;
+    border-radius:28px;
+    border: none;
+    cursor:pointer;
+    color:#336699;
+    font-family:Verdana;
+    font-size:8.5px;
+    font-weight: 600;
+    padding:1px 6px;
+    text-decoration:none;
+    box-shadow: 1px 1px 1px grey;
+    width: 85px;
+    display:block-inline;
+    margin: 1px 0px 4px 0px;
+}
+
+.ratingButton:active {
+    position:relative;
+    top:1px;
+}
+
+.popup {
+    position: absolute;
+    top: -141px;
+    left: 253px;
+    margin: 100px auto;
+    width: 210px;
+    height: 100px;
+    background-color: #FFFFFF;
+    border: 2px solid #D6D6D6;
+    z-index: 100000000000000000;
+}
+
+.notFoundPopup {
+    position: absolute;
+    top: -141px;
+    left: 253px;
+    margin: 100px auto;
+    width: 210px;
+    height: 50px;
+    background-color: #FFFFFF;
+    border: 2px solid #D6D6D6;
+    z-index: 100000000000000000;
+}
+
+.heading {
+    display: block;
+    background-color: #CEDEFA;
+    font-family: verdana;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #003366;
+    position: absolute;
+    width: 210px;
+    height: 10px;
+    text-align: center;
+    padding: 1px 0px 6px 0px; 
+}
+
+.heading a:hover {
+    color: blue;
+}
+
+.title {
+    display: block;
+    font-family: verdana;
+    font-size: 10px;
+    font-weight: 600;
+    color: #003366;
+    position: relative;
+    text-align: center;
+}
+
+.text {
+    font-family: verdana;
+    font-size: 10px;
+    position: relative;
+    text-align: center; 
+}
+
+.overall {
+    display: block;
+    position: absolute;
+    width: 105px;
+    height: 20px;
+    top: 22px;
+    left: 5px;
+}
+
+.avgGrade {
+    display: block;
+    position: absolute;
+    width: 105px;
+    height: 20px;
+    top: 22px;
+    left: 110px; 
+}
+
+.helpfulness {
+    display: block;
+    position: absolute;
+    width: 70px;
+    height: 20px;
+    top: 60px;
+    left: 4px;
+}
+
+.clarity {
+    display: block;
+    position: absolute;
+    width: 70px;
+    height: 20px;
+    top: 60px;
+    left: 85px;
+}
+
+.easiness {
+    display: block;
+    position: absolute;
+    width: 70px;
+    height: 20px;
+    top: 60px;
+    left: 143px;
+}
+
+.idk {
+    display: block;
+    font-family: verdana;
+    font-size: 11px;
+    position: absolute;
+    width: 210px;
+    height: 25px;
+    top: 25px;
+    text-align: center;
+} 
