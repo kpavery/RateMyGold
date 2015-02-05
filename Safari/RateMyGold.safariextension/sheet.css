@@ -28,7 +28,7 @@
     left: 253px;
     margin: 100px auto;
     width: 210px;
-    height: 100px;
+    height: 110px;
     background-color: #FFFFFF;
     border: 2px solid #D6D6D6;
     z-index: 100000000000000000;
@@ -53,6 +53,7 @@
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
+    text-decoration: underline;
     color: #003366;
     position: absolute;
     width: 210px;
@@ -87,7 +88,7 @@
     position: absolute;
     width: 105px;
     height: 20px;
-    top: 22px;
+    top: 30px;
     left: 5px;
 }
 
@@ -96,7 +97,7 @@
     position: absolute;
     width: 105px;
     height: 20px;
-    top: 22px;
+    top: 30px;
     left: 110px; 
 }
 
@@ -105,7 +106,7 @@
     position: absolute;
     width: 70px;
     height: 20px;
-    top: 60px;
+    top: 65px;
     left: 4px;
 }
 
@@ -114,7 +115,7 @@
     position: absolute;
     width: 70px;
     height: 20px;
-    top: 60px;
+    top: 65px;
     left: 85px;
 }
 
@@ -123,8 +124,26 @@
     position: absolute;
     width: 70px;
     height: 20px;
-    top: 60px;
+    top: 65px;
     left: 143px;
+}
+
+.numRatings {
+    /*display: block;*/
+    width: 210px;
+    height: 5px;
+    position: absolute;
+    font-family: verdana;
+    font-size: 10px;
+    color: #003366;
+    text-align: center;
+    text-transform: lowercase;
+    text-decoration: underline;
+    top: 20px;
+}
+
+.numRatings a:hover {
+    color: blue;
 }
 
 .idk {
