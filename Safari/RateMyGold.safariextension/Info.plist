@@ -38,6 +38,10 @@
 		<array>
 			<string>sheet.css</string>
 		</array>
+		<key>Whitelist</key>
+		<array>
+			<string>https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx</string>
+		</array>
 	</dict>
 	<key>Description</key>
 	<string>A Safari port of the RateMyGold Chrome extension.</string>
