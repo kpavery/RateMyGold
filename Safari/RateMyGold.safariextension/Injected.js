@@ -184,9 +184,6 @@ function parseMyEduCourseResponseHTML(messageEvent) {
 function parseSearchResponseHTML(messageEvent) {
 
 	if (messageEvent.name == "parseSearchResponseHTML") {
-
-		
-
 		var responseText = messageEvent.message;
 
 	    var tmp          = document.createElement('div');  //make a temp element so that we can search through its html
@@ -344,8 +341,6 @@ function parseProfessorResponseHTML(messageEvent) {
 		popup.appendChild(clarityDiv);
 		popup.appendChild(easinessDiv);
 		popup.appendChild(numRatingsDiv);
-
-
 	 }
 }
 
