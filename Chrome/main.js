@@ -113,7 +113,7 @@ function openPopup() {
    					  var proffName	    = tmp.getElementsByClassName('pfname')[0].innerText;
    					  var proflName	    = tmp.getElementsByClassName('plname')[0].innerText;
    					  var ratingInfo    = tmp.getElementsByClassName('left-breakdown')[0];
-              var numRatings    = tmp.getElementsByClassName('table-toggle rating-count active')[0].innerText;
+                      var numRatings    = tmp.getElementsByClassName('table-toggle rating-count active')[0].innerText;
    					  tmp.innerHTML     = ratingInfo.innerHTML;
 
    					  //get the raw rating data
@@ -130,6 +130,7 @@ function openPopup() {
    					  else 		    		      {hotnessFinal = "Hot";}
               */
 
+              var scale         = " / 5.0";
    					  var overall       = overallAndAvg[0];
    					  var avgGrade      = overallAndAvg[1];
    					  var helpfulness   = otherRatings[0];
@@ -138,7 +139,7 @@ function openPopup() {
    					  tmp.remove();
  
    					  //create the ratings divs
-   					  var profNameDiv         = document.createElement('div');
+   			      var profNameDiv         = document.createElement('div');
               var overallDiv          = document.createElement('div');
               var overallTitleDiv     = document.createElement('div');
               var overallTextDiv      = document.createElement('div');
@@ -179,15 +180,15 @@ function openPopup() {
               //put rating data in divs
               profNameDiv.innerHTML         = '<a href="'+ this.profURL + '" target="_blank">'+ proffName + " " + proflName; + '</a>';
               overallTitleDiv.innerText     = 'Overall Quality';
-              overallTextDiv.innerText      = overall.innerHTML;
+              overallTextDiv.innerText      = overall.innerHTML.concat(scale);
 					    avgGradeTitleDiv.innerText    = 'Average Grade';
 					    avgGradeTextDiv.innerText     = avgGrade.innerHTML;
 					    helpfulnessTitleDiv.innerText = 'Helpfulness';
-					    helpfulnessTextDiv.innerText  = helpfulness.innerHTML;
+					    helpfulnessTextDiv.innerText  = helpfulness.innerHTML.concat(scale);
 					    clarityTitleDiv.innerText     = 'Clarity';
-					    clarityTextDiv.innerText      = clarity.innerHTML;
+					    clarityTextDiv.innerText      = clarity.innerHTML.concat(scale);
 					    easinessTitleDiv.innerText    = 'Easiness';
-					    easinessTextDiv.innerText     = easiness.innerHTML;
+					    easinessTextDiv.innerText     = easiness.innerHTML.concat(scale);
 
               numRatings = numRatings.slice(9).split(' ')[0] //check to see if "ratings" is singular or plural
               if (numRatings == '1'){
