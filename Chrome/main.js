@@ -21,8 +21,13 @@ function main() {
 				div.firstName = ' ';
 			}
 			else if (nameArray[1].length > 1){ 
-				searchName    = nameArray[0] + ' ' + nameArray[1]; 
-				div.firstName = nameArray[2];
+				searchName    = nameArray[0] + ' ' + nameArray[1];
+        if (nameArray.length == 2){
+          div.firstName = ' ';
+        } 
+        else{
+				  div.firstName = nameArray[2];
+        }
 			}
 			else{ 
 				searchName    = nameArray[0]; 
@@ -84,7 +89,7 @@ function openPopup() {
    					tmp.innerHTML = foundProfs[i].innerHTML;
    					var name      = tmp.getElementsByClassName('main')[0].innerText;
 
-   					if (firstName.charAt(0) == name.split(',')[1].charAt(1)){ break;}
+   					if ((firstName.charAt(0) == name.split(',')[1].charAt(1)) || (firstName == ' ')){ break;}
    					else if (i == length-1) {
    						var emptyPopup       = popup;
               emptyPopup.className = 'notFoundPopup';
