@@ -164,7 +164,7 @@ function parseMyEduCourseResponseHTML(messageEvent) {
 			gpaDiv.className = 'gpa';
 			gpaTitleDiv.className = 'title';
 			gpaTextDiv.className = 'text';
-			gpaTitleDiv.innerText = 'GPA';
+			gpaTitleDiv.innerText = 'Average GPA';
 			gpaTextDiv.innerText = gpa;
 			gpaTitleDiv.appendChild(gpaTextDiv);
 			gpaDiv.appendChild(gpaTitleDiv);
