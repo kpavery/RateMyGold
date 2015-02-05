@@ -53,6 +53,7 @@
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
+    text-decoration: underline;
     color: #003366;
     position: absolute;
     width: 210px;
@@ -133,11 +134,16 @@
     height: 5px;
     position: absolute;
     font-family: verdana;
-    font-size: 9px;
+    font-size: 10px;
     color: #003366;
     text-align: center;
     text-transform: lowercase;
+    text-decoration: underline;
     top: 20px;
+}
+
+.numRatings a:hover {
+    color: blue;
 }
 
 .idk {

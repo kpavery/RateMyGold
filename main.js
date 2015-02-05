@@ -191,10 +191,10 @@ function openPopup() {
 
               numRatings = numRatings.slice(9).split(' ')[0] //check to see if "ratings" is singular or plural
               if (numRatings == '1'){
-                numRatingsDiv.innerText     = numRatings + " rating";
+                numRatingsDiv.innerHTML     = '<a href="'+ this.profURL + '" target="_blank">'+ numRatings + ' rating</a>';
               }
               else{
-                numRatingsDiv.innerText     = numRatings + " ratings";
+                numRatingsDiv.innerHTML     = '<a href="'+ this.profURL + '" target="_blank">'+ numRatings + ' ratings</a>';
               }
 
 					    //add divs to popup
