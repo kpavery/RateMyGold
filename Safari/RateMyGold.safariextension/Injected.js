@@ -131,13 +131,15 @@ function parseMyEduDepartmentResponseHTML(messageEvent) {
 function parseMyEduCourseResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseMyEduCourseResponseHTML") {
 		var responseText = messageEvent.message;
-		var regexp = /<tbody id=\"[a-z0-9\-]+\" class=\"list\"\s+data-w=\"(.*)\"\s+data-gpa=\"(.*)\"\s+data-past_year=\"(.*)\"\s+data-recs=\"(.*)\"\s+data-name=\"(.*)\"\s+shown=\"(.*)\"\s+>/g;
+		var regexp = /<tbody id=\"[a-z0-9\-]+\" class=\"list\"\s+data-w=\"(.*)\"\s+data-gpa=\"(.*)\"\s+data-past_year=\"(.*)\"\s+data-recs=\"(.*)\"\s+data-name=\"(.*)\"\s+shown=\"(.*)\"\s+>\s+<tr>\s+<td class=\"name\">\s+<a href=\"(.*)\">/g;
 		var match = regexp.exec(responseText);
 		var gpa;
+		var link;
 		var count = 0;
 		while (match != null) {
 			if (match[5].toLowerCase() == name.toLowerCase()) {
 				gpa = match[2];
+				link = match[7];
 				break;
 			}
 			count++;
@@ -165,13 +167,13 @@ function parseMyEduCourseResponseHTML(messageEvent) {
 			gpaTitleDiv.className = 'title';
 			gpaTextDiv.className = 'text';
 			gpaTitleDiv.innerText = 'Average GPA';
-			gpaTextDiv.innerText = gpa;
+			gpaTextDiv.innerHTML = "<a href=\"https://myedu.com" + link + "\" target=\"_blank\">" + gpa + "</a>";
 			gpaTitleDiv.appendChild(gpaTextDiv);
 			gpaDiv.appendChild(gpaTitleDiv);
 			popup.appendChild(gpaDiv);
 			if (image) {
 				var gpaImageDiv = document.createElement('div');
-				gpaImageDiv.innerHTML = "<img src=\"" + image + "\" />";
+				gpaImageDiv.innerHTML = "<a href=\"https://myedu.com" + link + "\" target=\"_blank\">" + "<img src=\"" + image + "\" />" + "</a>";
 				gpaImageDiv.className = "gpaimage";
 				popup.appendChild(gpaImageDiv);
 			}
