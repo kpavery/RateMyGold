@@ -188,11 +188,15 @@ function parseSearchResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseSearchResponseHTML") {
 		var responseText = messageEvent.message;
 
-	    var tmp          = document.createElement('div');  //make a temp element so that we can search through its html
-	    tmp.innerHTML  = responseText;
-	    var foundProfs = tmp.getElementsByClassName('listing PROFESSOR'); 
-	    
-	    if (foundProfs.length == 0){                     //if no results were returned, print this message
+	    var regexp = /<li class=\"listing PROFESSOR\">\s+<a href=\"(.*)\">\s+<span class=\"listing-cat\">\s+<span class=\".*\"><\/span>\s+.*\s+<\/span>\s+<span class=\"listing-name\">\s+<span class=\"main\">(.*)<\/span>\s+<span class=\".*\">.*<\/span>\s+<\/span>\s+<\/a><\/li>/g;
+		var match = regexp.exec(responseText);
+		var foundProfs = [];
+		while (match != null) {
+			foundProfs.push(match);
+			match = regexp.exec(responseText);
+		}
+
+		if (foundProfs.length == 0){                     //if no results were returned, print this message
 			var emptyPopup = popup;
 			emptyPopup.className = 'notFoundPopup';
 			var notFound         = document.createElement('div');
@@ -207,9 +211,7 @@ function parseSearchResponseHTML(messageEvent) {
 		} else { //iterate through the search results and match by first letter of first name to verify identity
 			var length = foundProfs.length;
 	    	for (var i = 0; i < length; i++) {
-		   		var tmp       = document.createElement('div');
-		   		tmp.innerHTML = foundProfs[i].innerHTML;
-		   		var name      = tmp.getElementsByClassName('main')[0].innerText;
+		   		var name = foundProfs[i][2];
 				if (firstName.charAt(0) == name.split(',')[1].charAt(1)){ 
 					break;
 				} else if (i == length-1) {
@@ -229,8 +231,7 @@ function parseSearchResponseHTML(messageEvent) {
 	    	}  //end for loop
 
 	    	//get the link for the actual professor page
-	    	var link     = tmp.getElementsByTagName('a');
-	    	this.profURL = 'http://www.ratemyprofessors.com/' + link[0].toString().slice(23); //this is the URL
+	    	this.profURL = "http://www.ratemyprofessors.com" + foundProfs[i][1];
 	    	var dataArray = [this.profURL, "parseProfessorResponseHTML"];
 			safari.self.tab.dispatchMessage("parseProfessorResponseHTML", dataArray);
 		} //end else
@@ -241,27 +242,33 @@ function parseSearchResponseHTML(messageEvent) {
 function parseProfessorResponseHTML(messageEvent) {
 
 	if (messageEvent.name == "parseProfessorResponseHTML") {
-
 		var responseText = messageEvent.message;
 
-		tmp = document.createElement('div');
-		tmp.innerHTML = responseText;
-		var proffName = tmp.getElementsByClassName('pfname')[0].innerText;
-		var proflName = tmp.getElementsByClassName('plname')[0].innerText;
-		var ratingInfo = tmp.getElementsByClassName('left-breakdown')[0];
-		var numRatings = tmp.getElementsByClassName('table-toggle rating-count active')[0].innerText;
-		tmp.innerHTML = ratingInfo.innerHTML;
+	    var regexp = /<span class=\"pfname\">(.*)<\/span>/g;
+		var match = regexp.exec(responseText);
+		var proffName = match[1];
 
-		//get the raw rating data
-		var overallAndAvg = tmp.getElementsByClassName('grade');
-		var otherRatings = tmp.getElementsByClassName('rating');
+		regexp = /<span class=\"plname\">(.*)<\/span>/g;
+		match = regexp.exec(responseText);
+		var proflName = match[1];
 
-		var overall = overallAndAvg[0];
-		var avgGrade = overallAndAvg[1];
-		var helpfulness = otherRatings[0];
-		var clarity = otherRatings[1];
-		var easiness = otherRatings[2];
-		tmp.remove();
+		regexp = /<div class=\"table-toggle rating-count active\" data-table=\".*\">\s+(.*) Student Ratings\s+<\/div>/g;
+		match = regexp.exec(responseText);
+		var numRatings = match[1];
+
+		regexp = /<div class=\"grade\">(.*)<\/div>/g;
+		match = regexp.exec(responseText);
+		var overall = match[1];
+		match = regexp.exec(responseText);
+		var avgGrade = match[1];
+
+		regexp = /<div class=\"rating\">(.*)<\/div>/g;
+		match = regexp.exec(responseText);
+		var helpfulness = match[1];
+		match = regexp.exec(responseText);
+		var clarity = match[1];
+		match = regexp.exec(responseText);
+		var easiness = match[1];
 
 		//create the ratings divs
 		var profNameDiv = document.createElement('div');
@@ -305,17 +312,17 @@ function parseProfessorResponseHTML(messageEvent) {
 		//put rating data in divs
 		profNameDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + proffName + " " + proflName; + '</a>';
 		overallTitleDiv.innerText = 'Overall Quality';
-		overallTextDiv.innerText = overall.innerHTML;
+		overallTextDiv.innerText = overall;
 		avgGradeTitleDiv.innerText = 'Average Grade';
-		avgGradeTextDiv.innerText = avgGrade.innerHTML;
+		avgGradeTextDiv.innerText = avgGrade;
 		helpfulnessTitleDiv.innerText = 'Helpfulness';
-		helpfulnessTextDiv.innerText = helpfulness.innerHTML;
+		helpfulnessTextDiv.innerText = helpfulness;
 		clarityTitleDiv.innerText = 'Clarity';
-		clarityTextDiv.innerText = clarity.innerHTML;
+		clarityTextDiv.innerText = clarity;
 		easinessTitleDiv.innerText = 'Easiness';
-		easinessTextDiv.innerText = easiness.innerHTML;
+		easinessTextDiv.innerText = easiness;
 
-		numRatings = numRatings.slice(9).split(' ')[0] //check to see if "ratings" is singular or plural
+		// numRatings = numRatings.slice(9).split(' ')[0] //check to see if "ratings" is singular or plural
 		if (numRatings == '1') {
 		    numRatingsDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + numRatings + ' rating</a>';
 		} else {
