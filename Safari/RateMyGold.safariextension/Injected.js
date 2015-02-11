@@ -25,8 +25,8 @@ if (document.URL == "https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx") {
 		}
 	}
 
-	for (var i = 3; i < length; i += 18) {                   //only iterate through cells which contain a professor name
-		var profName = cells[i].innerText.slice(0,-1);        //slice '&nbsp;'' character		
+	for (var i = 3; i < length; i += 18) {                       //only iterate through cells which contain a professor name
+		var profName = cells[i].innerText.slice(0,-1);           //slice '&nbsp;'' character		
 		if (profName != 'T.B.A.' && profName != 'Cancel'){
 			var parent = cells[i];
 			for (var j = 0; j < 11; j++)
@@ -37,43 +37,43 @@ if (document.URL == "https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx") {
 					number = courses[j].number;
 				}
 			}
-		    professors.push(profName.slice(0,-1));               //slice remaining space at end & push to professor array
-		    var div         = cells[i+9];                        //cell where the button will go
-		    var searchName  = '';
-		    var nameArray   = professors[profCount].split(' ');  //check if professor's last name is two words to include in search
-		    if (nameArray.length == 1){                          //special case for single name on gold
+			professors.push(profName.slice(0,-1));               //slice remaining space at end & push to professor array
+			var div         = cells[i+9];                        //cell where the button will go
+			var searchName  = '';
+			var nameArray   = professors[profCount].split(' ');  //check if professor's last name is two words to include in search
+			if (nameArray.length == 1){                          //special case for single name on gold
 				searchName    = nameArray[0];
 				div.firstName = ' ';
-		    } else if (nameArray[1].length > 1){ 
+			} else if (nameArray[1].length > 1){ 
 				searchName    = nameArray[0] + ' ' + nameArray[1]; 
 				div.firstName = nameArray[2];
-		    } else { 
+			} else { 
 				searchName    = nameArray[0];
 				div.firstName = nameArray[1];
-		    }
-		    
-		    div.searchURL = 'http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=university+of+california+santa+barbara&queryoption=HEADER&query='
-	                + searchName + '&facetSearch=true';
-	        div.department = department;
-	        div.number     = number;
-	        div.lastName   = searchName;
-		    div.profURL   = '';
-		    div.innerHTML = '<input class="ratingButton" type="button" value="SHOW RATING" />';
-		    div.cell      = cells[i+10];                          //cell where the popup's html will be placed
-		    div.clicked   = false;
-		    div.addEventListener('click', openPopup);
-		    profCount++;
+			}
+			
+			div.searchURL = 'http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=university+of+california+santa+barbara&queryoption=HEADER&query='
+					+ searchName + '&facetSearch=true';
+			div.department = department;
+			div.number     = number;
+			div.lastName   = searchName;
+			div.profURL    = '';
+			div.innerHTML  = '<input class="ratingButton" type="button" value="SHOW RATING" />';
+			div.cell       = cells[i+10];                        //cell where the popup's html will be placed
+			div.clicked    = false;
+			div.addEventListener('click', openPopup);
+			profCount++;
 		} //end if
 	}  //end for
 
 }
 
 function openPopup() {
-    if (this.clicked == true) {                              //happens when button was clicked while active
+    if (this.clicked == true) {                                  //happens when button was clicked while active
 		this.cell.innerHTML = '';
 		this.innerHTML      = '<input class="ratingButton" type="button" value="SHOW RATING" />';
 		this.clicked        = false;
-    } else {                                                  //happens when button was clicked while inactive
+    } else {                                                     //happens when button was clicked while inactive
 		name = this.lastName + " " + this.firstName;
 		this.clicked    = true;
 		this.innerHTML  = '<input class="ratingButton" type="button" value="HIDE RATING" />';
@@ -89,7 +89,7 @@ function openPopup() {
 		var dataArray = [this.searchURL, "parseSearchResponseHTML"];
 		safari.self.tab.dispatchMessage("parseSearchResponseHTML", dataArray); //end message
 		var secondDataArray = ["https://www.myedu.com/UCSB-University-of-California-Santa-Barbara/school/255/course/by-department/",
-		                       "parseMyEduSchoolResponseHTML"];
+								"parseMyEduSchoolResponseHTML"];
 		safari.self.tab.dispatchMessage("parseMyEduSchoolResponseHTML", secondDataArray);
 	} //end else
 } //end openPopup()
@@ -188,7 +188,7 @@ function parseSearchResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseSearchResponseHTML") {
 		var responseText = messageEvent.message;
 
-	    var regexp = /<li class=\"listing PROFESSOR\">\s+<a href=\"(.*)\">\s+<span class=\"listing-cat\">\s+<span class=\".*\"><\/span>\s+.*\s+<\/span>\s+<span class=\"listing-name\">\s+<span class=\"main\">(.*)<\/span>\s+<span class=\".*\">.*<\/span>\s+<\/span>\s+<\/a><\/li>/g;
+		var regexp = /<li class=\"listing PROFESSOR\">\s+<a href=\"(.*)\">\s+<span class=\"listing-cat\">\s+<span class=\".*\"><\/span>\s+.*\s+<\/span>\s+<span class=\"listing-name\">\s+<span class=\"main\">(.*)<\/span>\s+<span class=\".*\">.*<\/span>\s+<\/span>\s+<\/a><\/li>/g;
 		var match = regexp.exec(responseText);
 		var foundProfs = [];
 		while (match != null) {
@@ -200,7 +200,7 @@ function parseSearchResponseHTML(messageEvent) {
 			var emptyPopup = popup;
 			emptyPopup.className = 'notFoundPopup';
 			var notFound         = document.createElement('div');
-		    var idk              = document.createElement('div');  
+			var idk              = document.createElement('div');  
 			notFound.className   = 'heading';
 			idk.className        = 'idk';
 			notFound.innerText   = "Professor not found";
@@ -210,29 +210,29 @@ function parseSearchResponseHTML(messageEvent) {
 			emptyPopup.appendChild(idk);
 		} else { //iterate through the search results and match by first letter of first name to verify identity
 			var length = foundProfs.length;
-	    	for (var i = 0; i < length; i++) {
+			for (var i = 0; i < length; i++) {
 		   		var name = foundProfs[i][2];
 				if (firstName.charAt(0) == name.split(',')[1].charAt(1)){ 
 					break;
 				} else if (i == length-1) {
-	   		    	var emptyPopup       = popup;
-			    	emptyPopup.className = 'notFoundPopup';
-			    	var notFound         = document.createElement('div');
-			    	var idk              = document.createElement('div');  
-			    	notFound.className   = 'heading';
-			    	idk.className        = 'idk';
-				    notFound.innerText   = "Professor not found";
-				    idk.innerText        = "¯\\_(ツ)_/¯";
-				    emptyPopup.innerHTML = '';
-		    		emptyPopup.appendChild(notFound);
-	    			emptyPopup.appendChild(idk);
-		    		return 0;
+	   				var emptyPopup       = popup;
+					emptyPopup.className = 'notFoundPopup';
+					var notFound         = document.createElement('div');
+					var idk              = document.createElement('div');  
+					notFound.className   = 'heading';
+					idk.className        = 'idk';
+					notFound.innerText   = "Professor not found";
+					idk.innerText        = "¯\\_(ツ)_/¯";
+					emptyPopup.innerHTML = '';
+					emptyPopup.appendChild(notFound);
+					emptyPopup.appendChild(idk);
+					return 0;
 				} //end else if
-	    	}  //end for loop
+			}  //end for loop
 
-	    	//get the link for the actual professor page
-	    	this.profURL = "http://www.ratemyprofessors.com" + foundProfs[i][1];
-	    	var dataArray = [this.profURL, "parseProfessorResponseHTML"];
+			//get the link for the actual professor page
+			this.profURL = "http://www.ratemyprofessors.com" + foundProfs[i][1];
+			var dataArray = [this.profURL, "parseProfessorResponseHTML"];
 			safari.self.tab.dispatchMessage("parseProfessorResponseHTML", dataArray);
 		} //end else
 	} // End if event name is correct
@@ -244,7 +244,7 @@ function parseProfessorResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseProfessorResponseHTML") {
 		var responseText = messageEvent.message;
 
-	    var regexp = /<span class=\"pfname\">(.*)<\/span>/g;
+		var regexp = /<span class=\"pfname\">(.*)<\/span>/g;
 		var match = regexp.exec(responseText);
 		var proffName = match[1];
 
@@ -324,9 +324,9 @@ function parseProfessorResponseHTML(messageEvent) {
 
 		// numRatings = numRatings.slice(9).split(' ')[0] //check to see if "ratings" is singular or plural
 		if (numRatings == '1') {
-		    numRatingsDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + numRatings + ' rating</a>';
+			numRatingsDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + numRatings + ' rating</a>';
 		} else {
-		    numRatingsDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + numRatings + ' ratings</a>';
+			numRatingsDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + numRatings + ' ratings</a>';
 		}
 
 		//add divs to popup
