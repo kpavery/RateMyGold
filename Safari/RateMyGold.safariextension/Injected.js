@@ -68,6 +68,13 @@ if (document.URL == "https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx") {
 
 }
 
+function sanitize(string) {
+	return string.replace(/[^a-zA-Z0-9\.\/]/g,'');
+}
+function sanitizeURL(string) {
+		return string.replace(/[^\-A-Za-z0-9\+&@#\/%\?=~_|!:,.;\(\)]/g,'');
+}
+
 function openPopup() {
     if (this.clicked == true) {                                  //happens when button was clicked while active
 		this.cell.innerHTML = '';
@@ -167,13 +174,13 @@ function parseMyEduCourseResponseHTML(messageEvent) {
 			gpaTitleDiv.className = 'title';
 			gpaTextDiv.className = 'text';
 			gpaTitleDiv.innerText = 'Average GPA';
-			gpaTextDiv.innerHTML = "<a href=\"https://myedu.com" + link + "\" target=\"_blank\">" + gpa + "</a>";
+			gpaTextDiv.innerHTML = "<a href=\"https://myedu.com" + sanitizeURL(link) + "\" target=\"_blank\">" + sanitize(gpa) + "</a>";
 			gpaTitleDiv.appendChild(gpaTextDiv);
 			gpaDiv.appendChild(gpaTitleDiv);
 			popup.appendChild(gpaDiv);
 			if (image) {
 				var gpaImageDiv = document.createElement('div');
-				gpaImageDiv.innerHTML = "<a href=\"https://myedu.com" + link + "\" target=\"_blank\">" + "<img src=\"" + image + "\" />" + "</a>";
+				gpaImageDiv.innerHTML = "<a href=\"https://myedu.com" + sanitizeURL(link) + "\" target=\"_blank\">" + "<img src=\"" + sanitizeURL(image) + "\" />" + "</a>";
 				gpaImageDiv.className = "gpaimage";
 				popup.appendChild(gpaImageDiv);
 			}
@@ -310,23 +317,22 @@ function parseProfessorResponseHTML(messageEvent) {
 		numRatingsDiv.className = 'numRatings';
 
 		//put rating data in divs
-		profNameDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + proffName + " " + proflName; + '</a>';
+		profNameDiv.innerHTML = '<a href="' + sanitizeURL(this.profURL) + '" target="_blank">' + sanitize(proffName) + " " + sanitize(proflName) + '</a>';
 		overallTitleDiv.innerText = 'Overall Quality';
-		overallTextDiv.innerText = overall;
+		overallTextDiv.innerText = sanitize(overall);
 		avgGradeTitleDiv.innerText = 'Average Grade';
-		avgGradeTextDiv.innerText = avgGrade;
+		avgGradeTextDiv.innerText = sanitize(avgGrade);
 		helpfulnessTitleDiv.innerText = 'Helpfulness';
-		helpfulnessTextDiv.innerText = helpfulness;
+		helpfulnessTextDiv.innerText = sanitize(helpfulness);
 		clarityTitleDiv.innerText = 'Clarity';
-		clarityTextDiv.innerText = clarity;
+		clarityTextDiv.innerText = sanitize(clarity);
 		easinessTitleDiv.innerText = 'Easiness';
-		easinessTextDiv.innerText = easiness;
+		easinessTextDiv.innerText = sanitize(easiness);
 
-		// numRatings = numRatings.slice(9).split(' ')[0] //check to see if "ratings" is singular or plural
 		if (numRatings == '1') {
-			numRatingsDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + numRatings + ' rating</a>';
+			numRatingsDiv.innerHTML = '<a href="' + sanitizeURL(this.profURL) + '" target="_blank">' + sanitize(numRatings) + ' rating</a>';
 		} else {
-			numRatingsDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + numRatings + ' ratings</a>';
+			numRatingsDiv.innerHTML = '<a href="' + sanitizeURL(this.profURL) + '" target="_blank">' + sanitize(numRatings) + ' ratings</a>';
 		}
 
 		//add divs to popup
