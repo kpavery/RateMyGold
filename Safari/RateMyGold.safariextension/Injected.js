@@ -366,7 +366,16 @@ function parseProfessorResponseHTML(messageEvent) {
 
 function handleErrorFromRequest(messageEvent) {
 	if (messageEvent.name == "requestError") {
-		popup.innerText = "Load failed.";
+		var index = messageEvent.message[0];
+		var popup = popupcontexts[index][0];
+		if (popup.childNodes.length <= 1) { 
+			popup.removeChild(popup.lastChild);
+			popup.className = "popup error";
+			var errorDiv = document.createElement("div");
+			errorDiv.className = "centerError";
+			errorDiv.innerText = "Load failed.";
+			popup.appendChild(errorDiv);
+		}
 	}
 }
 
