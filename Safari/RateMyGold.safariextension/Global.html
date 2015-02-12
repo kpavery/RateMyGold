@@ -14,14 +14,15 @@ function executeRequest(messageEvent) {
 	var url = messageData[0];
 
 	var parseAction = messageData[1]; // "parseSearchResponseHTML" OR "parseProfessorResponseHTML"
+	var index = messageData[2];
 
 	var xhr = new XMLHttpRequest();
 
 	xhr.onload = function() {
-		safari.application.activeBrowserWindow.activeTab.page.dispatchMessage(parseAction, xhr.responseText); 
+		safari.application.activeBrowserWindow.activeTab.page.dispatchMessage(parseAction, [xhr.responseText, index]); 
     };
 	xhr.onerror = function() {
-		safari.application.activeBrowserWindow.activeTab.page.dispatchMessage(parseAction); 
+		safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("requestError", [index]); 
  	};
  	
   	xhr.open('GET', url, true);

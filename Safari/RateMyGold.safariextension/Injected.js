@@ -1,14 +1,10 @@
 
-var cells      = document.getElementsByClassName("clcellprimary");
-var length     = cells.length;
-var professors = [];
-var profCount  = 0;
-var popup;
-var firstName;
-var department;
-var number;
-var name;
-var courses    = [];
+var cells         = document.getElementsByClassName("clcellprimary");
+var length        = cells.length;
+var professors    = [];
+var profCount     = 0;
+var popupcontexts = [];     
+var courses       = [];
 
 // Loop through to add buttons below professor names
 
@@ -26,7 +22,7 @@ if (document.URL == "https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx") {
 	}
 
 	for (var i = 3; i < length; i += 18) {                       //only iterate through cells which contain a professor name
-		var profName = cells[i].innerText.slice(0,-1);           //slice '&nbsp;'' character		
+		var profName = cells[i].innerText.slice(0,-1);           //slice '&nbsp;'' character
 		if (profName != 'T.B.A.' && profName != 'Cancel'){
 			var parent = cells[i];
 			for (var j = 0; j < 11; j++)
@@ -69,7 +65,7 @@ if (document.URL == "https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx") {
 }
 
 function sanitize(string) {
-	return string.replace(/[^a-zA-Z0-9\.\/]/g,'');
+	return string.replace(/[^a-zA-Z0-9\.\/ ]/g,'');
 }
 function sanitizeURL(string) {
 		return string.replace(/[^\-A-Za-z0-9\+&@#\/%\?=~_|!:,.;\(\)]/g,'');
@@ -77,33 +73,35 @@ function sanitizeURL(string) {
 
 function openPopup() {
     if (this.clicked == true) {                                  //happens when button was clicked while active
-		this.cell.innerHTML = '';
+		this.cell.removeChild(this.cell.lastChild);
 		this.innerHTML      = '<input class="ratingButton" type="button" value="SHOW RATING" />';
 		this.clicked        = false;
     } else {                                                     //happens when button was clicked while inactive
-		name = this.lastName + " " + this.firstName;
+		var name = this.lastName + " " + this.firstName;
 		this.clicked    = true;
 		this.innerHTML  = '<input class="ratingButton" type="button" value="HIDE RATING" />';
-		popup       = document.createElement('div');
+		var index = popupcontexts.length;
+		var popup = document.createElement('div');
 		popup.className = 'popup';
 		popup.id = name;
 		popup.innerText = 'Loading...';
 		firstName   = this.firstName;
 		this.cell.style.position = 'relative';
 		this.cell.appendChild(popup);
-		department = this.department;
-		number = this.number;
-		var dataArray = [this.searchURL, "parseSearchResponseHTML"];
+		popupcontexts[index] = [popup, this.department, this.number, name, firstName];
+		var dataArray = [this.searchURL, "parseSearchResponseHTML", index];
 		safari.self.tab.dispatchMessage("parseSearchResponseHTML", dataArray); //end message
 		var secondDataArray = ["https://www.myedu.com/UCSB-University-of-California-Santa-Barbara/school/255/course/by-department/",
-								"parseMyEduSchoolResponseHTML"];
+								"parseMyEduSchoolResponseHTML", index];
 		safari.self.tab.dispatchMessage("parseMyEduSchoolResponseHTML", secondDataArray);
 	} //end else
 } //end openPopup()
 
 function parseMyEduSchoolResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseMyEduSchoolResponseHTML") {
-		var responseText = messageEvent.message;
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var department = popupcontexts[index][1];
 		var regexp = /<a class="abbreviation" href="(.*)">\s+(.*)\s+<\/a>/g;
 		var match = regexp.exec(responseText);
 		var foundlink;
@@ -113,14 +111,16 @@ function parseMyEduSchoolResponseHTML(messageEvent) {
 			}
 			match = regexp.exec(responseText);
 		}
-		var dataArray = [foundlink, "parseMyEduDepartmentResponseHTML"];
+		var dataArray = [foundlink, "parseMyEduDepartmentResponseHTML", index];
 		safari.self.tab.dispatchMessage("parseMyEduDepartmentResponseHTML", dataArray);
 	}
 }
 
 function parseMyEduDepartmentResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseMyEduDepartmentResponseHTML") {
-		var responseText = messageEvent.message;
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var number = popupcontexts[index][2];
 		var regexp = /<a class="abbreviation" href="(.*)">\s+(.*)\s+<\/a>/g;
 		var match = regexp.exec(responseText);
 		var foundlink;
@@ -130,14 +130,17 @@ function parseMyEduDepartmentResponseHTML(messageEvent) {
 			}
 			match = regexp.exec(responseText);
 		}
-		var dataArray = [foundlink, "parseMyEduCourseResponseHTML"];
+		var dataArray = [foundlink, "parseMyEduCourseResponseHTML", index];
 		safari.self.tab.dispatchMessage("parseMyEduCourseResponseHTML", dataArray);
 	}
 }
 
 function parseMyEduCourseResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseMyEduCourseResponseHTML") {
-		var responseText = messageEvent.message;
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var popup = popupcontexts[index][0];
+		var name = popupcontexts[index][3];
 		var regexp = /<tbody id=\"[a-z0-9\-]+\" class=\"list\"\s+data-w=\"(.*)\"\s+data-gpa=\"(.*)\"\s+data-past_year=\"(.*)\"\s+data-recs=\"(.*)\"\s+data-name=\"(.*)\"\s+shown=\"(.*)\"\s+>\s+<tr>\s+<td class=\"name\">\s+<a href=\"(.*)\">/g;
 		var match = regexp.exec(responseText);
 		var gpa;
@@ -184,7 +187,6 @@ function parseMyEduCourseResponseHTML(messageEvent) {
 				gpaImageDiv.className = "gpaimage";
 				popup.appendChild(gpaImageDiv);
 			}
-			var popups = document.getElementsByClassName("popup");
 		}
 	}
 }
@@ -193,8 +195,10 @@ function parseMyEduCourseResponseHTML(messageEvent) {
 function parseSearchResponseHTML(messageEvent) {
 
 	if (messageEvent.name == "parseSearchResponseHTML") {
-		var responseText = messageEvent.message;
-
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var popup = popupcontexts[index][0];
+		var fullname = popupcontexts[index][3];
 		var regexp = /<li class=\"listing PROFESSOR\">\s+<a href=\"(.*)\">\s+<span class=\"listing-cat\">\s+<span class=\".*\"><\/span>\s+.*\s+<\/span>\s+<span class=\"listing-name\">\s+<span class=\"main\">(.*)<\/span>\s+<span class=\".*\">.*<\/span>\s+<\/span>\s+<\/a><\/li>/g;
 		var match = regexp.exec(responseText);
 		var foundProfs = [];
@@ -204,16 +208,16 @@ function parseSearchResponseHTML(messageEvent) {
 		}
 
 		if (foundProfs.length == 0){                     //if no results were returned, print this message
-			var emptyPopup = popup;
-			emptyPopup.className = 'notFoundPopup';
-			var notFound         = document.createElement('div');
-			var idk              = document.createElement('div');  
-			notFound.className   = 'heading';
-			idk.className        = 'idk';
-			notFound.innerText   = "Professor not found";
-			idk.innerText        = "¯\\_(ツ)_/¯";   
-			emptyPopup.innerHTML = '';
-			emptyPopup.appendChild(notFound);
+			var emptyPopup        = popup;
+			emptyPopup.className  = 'notFoundPopup';
+			var profNameDiv       = document.createElement('div');
+			var idk               = document.createElement('div');  
+			profNameDiv.className = 'heading';
+			idk.className         = 'idk';
+			profNameDiv.innerText = sanitize(fullname);
+			idk.innerHTML         = "Professor not found on RateMyProfessors.<br /><br />¯\\_(ツ)_/¯";
+			emptyPopup.innerHTML  = '';
+			emptyPopup.appendChild(profNameDiv);
 			emptyPopup.appendChild(idk);
 		} else { //iterate through the search results and match by first letter of first name to verify identity
 			var length = foundProfs.length;
@@ -222,16 +226,16 @@ function parseSearchResponseHTML(messageEvent) {
 				if (firstName.charAt(0) == name.split(',')[1].charAt(1)){ 
 					break;
 				} else if (i == length-1) {
-	   				var emptyPopup       = popup;
-					emptyPopup.className = 'notFoundPopup';
-					var notFound         = document.createElement('div');
-					var idk              = document.createElement('div');  
-					notFound.className   = 'heading';
-					idk.className        = 'idk';
-					notFound.innerText   = "Professor not found";
-					idk.innerText        = "¯\\_(ツ)_/¯";
-					emptyPopup.innerHTML = '';
-					emptyPopup.appendChild(notFound);
+	   				var emptyPopup        = popup;
+					emptyPopup.className  = 'notFoundPopup';
+					var profNameDiv       = document.createElement('div');
+					var idk               = document.createElement('div');  
+					profNameDiv.className = 'heading';
+					idk.className         = 'idk';
+					profNameDiv.innerText = sanitize(fullname);
+					idk.innerHTML         = "Professor not found on RateMyProfessors.<br /><br />¯\\_(ツ)_/¯";
+					emptyPopup.innerHTML  = '';
+					emptyPopup.appendChild(profNameDiv);
 					emptyPopup.appendChild(idk);
 					return 0;
 				} //end else if
@@ -239,7 +243,7 @@ function parseSearchResponseHTML(messageEvent) {
 
 			//get the link for the actual professor page
 			this.profURL = "http://www.ratemyprofessors.com" + foundProfs[i][1];
-			var dataArray = [this.profURL, "parseProfessorResponseHTML"];
+			var dataArray = [this.profURL, "parseProfessorResponseHTML", index];
 			safari.self.tab.dispatchMessage("parseProfessorResponseHTML", dataArray);
 		} //end else
 	} // End if event name is correct
@@ -249,8 +253,9 @@ function parseSearchResponseHTML(messageEvent) {
 function parseProfessorResponseHTML(messageEvent) {
 
 	if (messageEvent.name == "parseProfessorResponseHTML") {
-		var responseText = messageEvent.message;
-
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var popup = popupcontexts[index][0];
 		var regexp = /<span class=\"pfname\">(.*)<\/span>/g;
 		var match = regexp.exec(responseText);
 		var proffName = match[1];
@@ -359,8 +364,15 @@ function parseProfessorResponseHTML(messageEvent) {
 	 }
 }
 
+function handleErrorFromRequest(messageEvent) {
+	if (messageEvent.name == "requestError") {
+		popup.innerText = "Load failed.";
+	}
+}
+
 safari.self.addEventListener("message", parseMyEduSchoolResponseHTML, false);
 safari.self.addEventListener("message", parseMyEduDepartmentResponseHTML, false);
 safari.self.addEventListener("message", parseMyEduCourseResponseHTML, false);
 safari.self.addEventListener("message", parseProfessorResponseHTML, false);
 safari.self.addEventListener("message", parseSearchResponseHTML, false);
+safari.self.addEventListener("message", handleErrorFromRequest, false);
