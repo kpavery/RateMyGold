@@ -226,17 +226,7 @@ function parseSearchResponseHTML(messageEvent) {
 				if (firstName.charAt(0) == name.split(',')[1].charAt(1)){ 
 					break;
 				} else if (i == length-1) {
-	   				var emptyPopup        = popup;
-					emptyPopup.className  = 'notFoundPopup';
-					var profNameDiv       = document.createElement('div');
-					var idk               = document.createElement('div');  
-					profNameDiv.className = 'heading';
-					idk.className         = 'idk';
-					profNameDiv.innerText = sanitize(fullname);
-					idk.innerHTML         = "Professor not found on RateMyProfessors.<br /><br />¯\\_(ツ)_/¯";
-					emptyPopup.innerHTML  = '';
-					emptyPopup.appendChild(profNameDiv);
-					emptyPopup.appendChild(idk);
+	   				notFound(index);
 					return 0;
 				} //end else if
 			}  //end for loop
@@ -256,11 +246,15 @@ function parseProfessorResponseHTML(messageEvent) {
 		var responseText = messageEvent.message[0];
 		var index = messageEvent.message[1];
 		var popup = popupcontexts[index][0];
-		var regexp = /<span class=\"pfname\">(.*)<\/span>/g;
+		var regexp = /<span\s+class=\"pfname\">\s*(.*)\s*<\/span>/g;
 		var match = regexp.exec(responseText);
+		if (match == null) {
+			notFound(index);
+			return 0;
+		}
 		var proffName = match[1];
 
-		regexp = /<span class=\"plname\">(.*)<\/span>/g;
+		regexp = /<span\s+class=\"plname\">\s*(.*)\s*<\/span>/g;
 		match = regexp.exec(responseText);
 		var proflName = match[1];
 
@@ -340,9 +334,10 @@ function parseProfessorResponseHTML(messageEvent) {
 			numRatingsDiv.innerHTML = '<a href="' + sanitizeURL(this.profURL) + '" target="_blank">' + sanitize(numRatings) + ' ratings</a>';
 		}
 
-		//add divs to popup
-		popup.innerHTML = ''; //remove 'loading...' text
+		// remove 'Loading...' text
+		popup.innerHTML = popup.innerHTML.replace('Loading...','');
 
+		//add divs to popup
 		overallTitleDiv.appendChild(overallTextDiv);
 		overallDiv.appendChild(overallTitleDiv);
 		avgGradeTitleDiv.appendChild(avgGradeTextDiv);
@@ -362,6 +357,22 @@ function parseProfessorResponseHTML(messageEvent) {
 		popup.appendChild(easinessDiv);
 		popup.appendChild(numRatingsDiv);
 	 }
+}
+
+function notFound(index) {
+	var popup = popupcontexts[index][0];
+	var fullname = popupcontexts[index][3];
+	var emptyPopup        = popup;
+	emptyPopup.className  = 'notFoundPopup';
+	var profNameDiv       = document.createElement('div');
+	var idk               = document.createElement('div');  
+	profNameDiv.className = 'heading';
+	idk.className         = 'idk';
+	profNameDiv.innerText = sanitize(fullname);
+	idk.innerHTML         = "Professor not found on RateMyProfessors.<br /><br />¯\\_(ツ)_/¯";
+	emptyPopup.innerHTML  = '';
+	emptyPopup.appendChild(profNameDiv);
+	emptyPopup.appendChild(idk);
 }
 
 function handleErrorFromRequest(messageEvent) {
