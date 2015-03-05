@@ -29,10 +29,6 @@
 			<array>
 				<string>Injected.js</string>
 			</array>
-			<key>Start</key>
-			<array>
-				<string>jquery.min.js</string>
-			</array>
 		</dict>
 		<key>Stylesheets</key>
 		<array>
