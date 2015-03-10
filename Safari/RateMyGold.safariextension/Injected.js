@@ -177,6 +177,7 @@ function parseMyEduCourseResponseHTML(messageEvent) {
 			gpaTitleDiv.className = 'title';
 			gpaTextDiv.className = 'text';
 			gpaTitleDiv.innerText = 'Average GPA';
+			gpa = parseFloat(gpa).toPrecision(3).toString();
 			gpaTextDiv.innerHTML = "<a href=\"https://myedu.com" + sanitizeURL(link) + "\" target=\"_blank\">" + sanitize(gpa) + "</a>";
 			gpaTitleDiv.appendChild(gpaTextDiv);
 			gpaDiv.appendChild(gpaTitleDiv);
