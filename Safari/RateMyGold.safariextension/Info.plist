@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Connor Mulcahey</string>
 	<key>Builder Version</key>
-	<string>10600.5.3.1</string>
+	<string>10600.5.6</string>
 	<key>CFBundleDisplayName</key>
 	<string>RateMyGold</string>
 	<key>CFBundleIdentifier</key>
@@ -29,10 +29,6 @@
 			<array>
 				<string>Injected.js</string>
 			</array>
-			<key>Start</key>
-			<array>
-				<string>jquery.min.js</string>
-			</array>
 		</dict>
 		<key>Stylesheets</key>
 		<array>
@@ -53,10 +49,15 @@
 	<dict>
 		<key>Website Access</key>
 		<dict>
+			<key>Allowed Domains</key>
+			<array>
+				<string>ratemyprofessors.com</string>
+				<string>myedu.com</string>
+			</array>
 			<key>Include Secure Pages</key>
 			<true/>
 			<key>Level</key>
-			<string>All</string>
+			<string>Some</string>
 		</dict>
 	</dict>
 	<key>Website</key>
