@@ -44,10 +44,14 @@
     left: 253px;
     margin: 100px auto;
     width: 210px;
-    height: 50px;
+    height: 70px;
     background-color: #FFFFFF;
     border: 2px solid #D6D6D6;
     z-index: 100000000000000000;
+}
+
+.popup .heading {
+    text-decoration: underline;
 }
 
 .heading {
@@ -57,7 +61,6 @@
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    text-decoration: underline;
     color: #003366;
     position: absolute;
     width: 100%;
@@ -190,5 +193,16 @@
     width: 100%;
     height: 25px;
     top: 25px;
+    text-align: center;
+}
+
+.error {
+    height: 20px;
+}
+
+.centerError {
+    width: 100%;
+    height: 17px;
+    margin-top: 3px;
     text-align: center;
 }

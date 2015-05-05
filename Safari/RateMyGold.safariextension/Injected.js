@@ -1,14 +1,10 @@
 
-var cells      = document.getElementsByClassName("clcellprimary");
-var length     = cells.length;
-var professors = [];
-var profCount  = 0;
-var popup;
-var firstName;
-var department;
-var number;
-var name;
-var courses    = [];
+var cells         = document.getElementsByClassName("clcellprimary");
+var length        = cells.length;
+var professors    = [];
+var profCount     = 0;
+var popupcontexts = [];     
+var courses       = [];
 
 // Loop through to add buttons below professor names
 
@@ -25,8 +21,8 @@ if (document.URL == "https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx") {
 		}
 	}
 
-	for (var i = 3; i < length; i += 18) {                   //only iterate through cells which contain a professor name
-		var profName = cells[i].innerText.slice(0,-1);        //slice '&nbsp;'' character		
+	for (var i = 3; i < length; i += 18) {                       //only iterate through cells which contain a professor name
+		var profName = cells[i].innerText.slice(0,-1);           //slice '&nbsp;'' character
 		if (profName != 'T.B.A.' && profName != 'Cancel'){
 			var parent = cells[i];
 			for (var j = 0; j < 11; j++)
@@ -37,66 +33,75 @@ if (document.URL == "https://my.sa.ucsb.edu/gold/ResultsFindCourses.aspx") {
 					number = courses[j].number;
 				}
 			}
-		    professors.push(profName.slice(0,-1));               //slice remaining space at end & push to professor array
-		    var div         = cells[i+9];                        //cell where the button will go
-		    var searchName  = '';
-		    var nameArray   = professors[profCount].split(' ');  //check if professor's last name is two words to include in search
-		    if (nameArray.length == 1){                          //special case for single name on gold
+			professors.push(profName.slice(0,-1));               //slice remaining space at end & push to professor array
+			var div         = cells[i+9];                        //cell where the button will go
+			var searchName  = '';
+			var nameArray   = professors[profCount].split(' ');  //check if professor's last name is two words to include in search
+			if (nameArray.length == 1){                          //special case for single name on gold
 				searchName    = nameArray[0];
 				div.firstName = ' ';
-		    } else if (nameArray[1].length > 1){ 
+			} else if (nameArray[1].length > 1){ 
 				searchName    = nameArray[0] + ' ' + nameArray[1]; 
 				div.firstName = nameArray[2];
-		    } else { 
+			} else { 
 				searchName    = nameArray[0];
 				div.firstName = nameArray[1];
-		    }
-		    
-		    div.searchURL = 'http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=university+of+california+santa+barbara&queryoption=HEADER&query='
-	                + searchName + '&facetSearch=true';
-	        div.department = department;
-	        div.number     = number;
-	        div.lastName   = searchName;
-		    div.profURL   = '';
-		    div.innerHTML = '<input class="ratingButton" type="button" value="SHOW RATING" />';
-		    div.cell      = cells[i+10];                          //cell where the popup's html will be placed
-		    div.clicked   = false;
-		    div.addEventListener('click', openPopup);
-		    profCount++;
+			}
+			
+			div.searchURL = 'http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=university+of+california+santa+barbara&queryoption=HEADER&query='
+					+ searchName + '&facetSearch=true';
+			div.department = department;
+			div.number     = number;
+			div.lastName   = searchName;
+			div.profURL    = '';
+			div.innerHTML  = '<input class="ratingButton" type="button" value="SHOW RATING" />';
+			div.cell       = cells[i+10];                        //cell where the popup's html will be placed
+			div.clicked    = false;
+			div.addEventListener('click', openPopup);
+			profCount++;
 		} //end if
 	}  //end for
 
 }
 
+function sanitize(string) {
+	return string.replace(/[^a-zA-Z0-9\.\/ ]/g,'');
+}
+function sanitizeURL(string) {
+		return string.replace(/[^\-A-Za-z0-9\+&@#\/%\?=~_|!:,.;\(\)]/g,'');
+}
+
 function openPopup() {
-    if (this.clicked == true) {                              //happens when button was clicked while active
-		this.cell.innerHTML = '';
+    if (this.clicked == true) {                                  //happens when button was clicked while active
+		this.cell.removeChild(this.cell.lastChild);
 		this.innerHTML      = '<input class="ratingButton" type="button" value="SHOW RATING" />';
 		this.clicked        = false;
-    } else {                                                  //happens when button was clicked while inactive
-		name = this.lastName + " " + this.firstName;
+    } else {                                                     //happens when button was clicked while inactive
+		var name = this.lastName + " " + this.firstName;
 		this.clicked    = true;
 		this.innerHTML  = '<input class="ratingButton" type="button" value="HIDE RATING" />';
-		popup       = document.createElement('div');
+		var index = popupcontexts.length;
+		var popup = document.createElement('div');
 		popup.className = 'popup';
 		popup.id = name;
 		popup.innerText = 'Loading...';
 		firstName   = this.firstName;
 		this.cell.style.position = 'relative';
 		this.cell.appendChild(popup);
-		department = this.department;
-		number = this.number;
-		var dataArray = [this.searchURL, "parseSearchResponseHTML"];
+		popupcontexts[index] = [popup, this.department, this.number, name, firstName];
+		var dataArray = [this.searchURL, "parseSearchResponseHTML", index];
 		safari.self.tab.dispatchMessage("parseSearchResponseHTML", dataArray); //end message
 		var secondDataArray = ["https://www.myedu.com/UCSB-University-of-California-Santa-Barbara/school/255/course/by-department/",
-		                       "parseMyEduSchoolResponseHTML"];
+								"parseMyEduSchoolResponseHTML", index];
 		safari.self.tab.dispatchMessage("parseMyEduSchoolResponseHTML", secondDataArray);
 	} //end else
 } //end openPopup()
 
 function parseMyEduSchoolResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseMyEduSchoolResponseHTML") {
-		var responseText = messageEvent.message;
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var department = popupcontexts[index][1];
 		var regexp = /<a class="abbreviation" href="(.*)">\s+(.*)\s+<\/a>/g;
 		var match = regexp.exec(responseText);
 		var foundlink;
@@ -106,14 +111,16 @@ function parseMyEduSchoolResponseHTML(messageEvent) {
 			}
 			match = regexp.exec(responseText);
 		}
-		var dataArray = [foundlink, "parseMyEduDepartmentResponseHTML"];
+		var dataArray = [foundlink, "parseMyEduDepartmentResponseHTML", index];
 		safari.self.tab.dispatchMessage("parseMyEduDepartmentResponseHTML", dataArray);
 	}
 }
 
 function parseMyEduDepartmentResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseMyEduDepartmentResponseHTML") {
-		var responseText = messageEvent.message;
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var number = popupcontexts[index][2];
 		var regexp = /<a class="abbreviation" href="(.*)">\s+(.*)\s+<\/a>/g;
 		var match = regexp.exec(responseText);
 		var foundlink;
@@ -123,21 +130,26 @@ function parseMyEduDepartmentResponseHTML(messageEvent) {
 			}
 			match = regexp.exec(responseText);
 		}
-		var dataArray = [foundlink, "parseMyEduCourseResponseHTML"];
+		var dataArray = [foundlink, "parseMyEduCourseResponseHTML", index];
 		safari.self.tab.dispatchMessage("parseMyEduCourseResponseHTML", dataArray);
 	}
 }
 
 function parseMyEduCourseResponseHTML(messageEvent) {
 	if (messageEvent.name == "parseMyEduCourseResponseHTML") {
-		var responseText = messageEvent.message;
-		var regexp = /<tbody id=\"[a-z0-9\-]+\" class=\"list\"\s+data-w=\"(.*)\"\s+data-gpa=\"(.*)\"\s+data-past_year=\"(.*)\"\s+data-recs=\"(.*)\"\s+data-name=\"(.*)\"\s+shown=\"(.*)\"\s+>/g;
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var popup = popupcontexts[index][0];
+		var name = popupcontexts[index][3];
+		var regexp = /<tbody id=\"[a-z0-9\-]+\" class=\"list\"\s+data-w=\"(.*)\"\s+data-gpa=\"(.*)\"\s+data-past_year=\"(.*)\"\s+data-recs=\"(.*)\"\s+data-name=\"(.*)\"\s+shown=\"(.*)\"\s+>\s+<tr>\s+<td class=\"name\">\s+<a href=\"(.*)\">/g;
 		var match = regexp.exec(responseText);
 		var gpa;
+		var link;
 		var count = 0;
 		while (match != null) {
 			if (match[5].toLowerCase() == name.toLowerCase()) {
 				gpa = match[2];
+				link = match[7];
 				break;
 			}
 			count++;
@@ -165,17 +177,17 @@ function parseMyEduCourseResponseHTML(messageEvent) {
 			gpaTitleDiv.className = 'title';
 			gpaTextDiv.className = 'text';
 			gpaTitleDiv.innerText = 'Average GPA';
-			gpaTextDiv.innerText = gpa;
+			gpa = parseFloat(gpa).toPrecision(3).toString();
+			gpaTextDiv.innerHTML = "<a href=\"https://myedu.com" + sanitizeURL(link) + "\" target=\"_blank\">" + sanitize(gpa) + "</a>";
 			gpaTitleDiv.appendChild(gpaTextDiv);
 			gpaDiv.appendChild(gpaTitleDiv);
 			popup.appendChild(gpaDiv);
 			if (image) {
 				var gpaImageDiv = document.createElement('div');
-				gpaImageDiv.innerHTML = "<img src=\"" + image + "\" />";
+				gpaImageDiv.innerHTML = "<a href=\"https://myedu.com" + sanitizeURL(link) + "\" target=\"_blank\">" + "<img src=\"" + sanitizeURL(image) + "\" />" + "</a>";
 				gpaImageDiv.className = "gpaimage";
 				popup.appendChild(gpaImageDiv);
 			}
-			var popups = document.getElementsByClassName("popup");
 		}
 	}
 }
@@ -184,52 +196,45 @@ function parseMyEduCourseResponseHTML(messageEvent) {
 function parseSearchResponseHTML(messageEvent) {
 
 	if (messageEvent.name == "parseSearchResponseHTML") {
-		var responseText = messageEvent.message;
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var popup = popupcontexts[index][0];
+		var fullname = popupcontexts[index][3];
+		var regexp = /<li class=\"listing PROFESSOR\">\s+<a href=\"(.*)\">\s+<span class=\"listing-cat\">\s+<span class=\".*\"><\/span>\s+.*\s+<\/span>\s+<span class=\"listing-name\">\s+<span class=\"main\">(.*)<\/span>\s+<span class=\".*\">.*<\/span>\s+<\/span>\s+<\/a><\/li>/g;
+		var match = regexp.exec(responseText);
+		var foundProfs = [];
+		while (match != null) {
+			foundProfs.push(match);
+			match = regexp.exec(responseText);
+		}
 
-	    var tmp          = document.createElement('div');  //make a temp element so that we can search through its html
-	    tmp.innerHTML  = responseText;
-	    var foundProfs = tmp.getElementsByClassName('listing PROFESSOR'); 
-	    
-	    if (foundProfs.length == 0){                     //if no results were returned, print this message
-			var emptyPopup = popup;
-			emptyPopup.className = 'notFoundPopup';
-			var notFound         = document.createElement('div');
-		    var idk              = document.createElement('div');  
-			notFound.className   = 'heading';
-			idk.className        = 'idk';
-			notFound.innerText   = "Professor not found";
-			idk.innerText        = "¯\\_(ツ)_/¯";   
-			emptyPopup.innerHTML = '';
-			emptyPopup.appendChild(notFound);
+		if (foundProfs.length == 0){                     //if no results were returned, print this message
+			var emptyPopup        = popup;
+			emptyPopup.className  = 'notFoundPopup';
+			var profNameDiv       = document.createElement('div');
+			var idk               = document.createElement('div');  
+			profNameDiv.className = 'heading';
+			idk.className         = 'idk';
+			profNameDiv.innerText = sanitize(fullname);
+			idk.innerHTML         = "Professor not found on RateMyProfessors.<br /><br />¯\\_(ツ)_/¯";
+			emptyPopup.innerHTML  = '';
+			emptyPopup.appendChild(profNameDiv);
 			emptyPopup.appendChild(idk);
 		} else { //iterate through the search results and match by first letter of first name to verify identity
 			var length = foundProfs.length;
-	    	for (var i = 0; i < length; i++) {
-		   		var tmp       = document.createElement('div');
-		   		tmp.innerHTML = foundProfs[i].innerHTML;
-		   		var name      = tmp.getElementsByClassName('main')[0].innerText;
+			for (var i = 0; i < length; i++) {
+		   		var name = foundProfs[i][2];
 				if (firstName.charAt(0) == name.split(',')[1].charAt(1)){ 
 					break;
 				} else if (i == length-1) {
-	   		    	var emptyPopup       = popup;
-			    	emptyPopup.className = 'notFoundPopup';
-			    	var notFound         = document.createElement('div');
-			    	var idk              = document.createElement('div');  
-			    	notFound.className   = 'heading';
-			    	idk.className        = 'idk';
-				    notFound.innerText   = "Professor not found";
-				    idk.innerText        = "¯\\_(ツ)_/¯";
-				    emptyPopup.innerHTML = '';
-		    		emptyPopup.appendChild(notFound);
-	    			emptyPopup.appendChild(idk);
-		    		return 0;
+	   				notFound(index);
+					return 0;
 				} //end else if
-	    	}  //end for loop
+			}  //end for loop
 
-	    	//get the link for the actual professor page
-	    	var link     = tmp.getElementsByTagName('a');
-	    	this.profURL = 'http://www.ratemyprofessors.com/' + link[0].toString().slice(23); //this is the URL
-	    	var dataArray = [this.profURL, "parseProfessorResponseHTML"];
+			//get the link for the actual professor page
+			this.profURL = "http://www.ratemyprofessors.com" + foundProfs[i][1];
+			var dataArray = [this.profURL, "parseProfessorResponseHTML", index];
 			safari.self.tab.dispatchMessage("parseProfessorResponseHTML", dataArray);
 		} //end else
 	} // End if event name is correct
@@ -239,27 +244,38 @@ function parseSearchResponseHTML(messageEvent) {
 function parseProfessorResponseHTML(messageEvent) {
 
 	if (messageEvent.name == "parseProfessorResponseHTML") {
+		var responseText = messageEvent.message[0];
+		var index = messageEvent.message[1];
+		var popup = popupcontexts[index][0];
+		var regexp = /<span\s+class=\"pfname\">\s*(.*)\s*<\/span>/g;
+		var match = regexp.exec(responseText);
+		if (match == null) {
+			notFound(index);
+			return 0;
+		}
+		var proffName = match[1];
 
-		var responseText = messageEvent.message;
+		regexp = /<span\s+class=\"plname\">\s*(.*)\s*<\/span>/g;
+		match = regexp.exec(responseText);
+		var proflName = match[1];
 
-		tmp = document.createElement('div');
-		tmp.innerHTML = responseText;
-		var proffName = tmp.getElementsByClassName('pfname')[0].innerText;
-		var proflName = tmp.getElementsByClassName('plname')[0].innerText;
-		var ratingInfo = tmp.getElementsByClassName('left-breakdown')[0];
-		var numRatings = tmp.getElementsByClassName('table-toggle rating-count active')[0].innerText;
-		tmp.innerHTML = ratingInfo.innerHTML;
+		regexp = /<div class=\"table-toggle rating-count active\" data-table=\".*\">\s+(.*) Student Ratings\s+<\/div>/g;
+		match = regexp.exec(responseText);
+		var numRatings = match[1];
 
-		//get the raw rating data
-		var overallAndAvg = tmp.getElementsByClassName('grade');
-		var otherRatings = tmp.getElementsByClassName('rating');
+		regexp = /<div class=\"grade\">(.*)<\/div>/g;
+		match = regexp.exec(responseText);
+		var overall = match[1];
+		match = regexp.exec(responseText);
+		var avgGrade = match[1];
 
-		var overall = overallAndAvg[0];
-		var avgGrade = overallAndAvg[1];
-		var helpfulness = otherRatings[0];
-		var clarity = otherRatings[1];
-		var easiness = otherRatings[2];
-		tmp.remove();
+		regexp = /<div class=\"rating\">(.*)<\/div>/g;
+		match = regexp.exec(responseText);
+		var helpfulness = match[1];
+		match = regexp.exec(responseText);
+		var clarity = match[1];
+		match = regexp.exec(responseText);
+		var easiness = match[1];
 
 		//create the ratings divs
 		var profNameDiv = document.createElement('div');
@@ -301,28 +317,28 @@ function parseProfessorResponseHTML(messageEvent) {
 		numRatingsDiv.className = 'numRatings';
 
 		//put rating data in divs
-		profNameDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + proffName + " " + proflName; + '</a>';
+		profNameDiv.innerHTML = '<a href="' + sanitizeURL(this.profURL) + '" target="_blank">' + sanitize(proffName) + " " + sanitize(proflName) + '</a>';
 		overallTitleDiv.innerText = 'Overall Quality';
-		overallTextDiv.innerText = overall.innerHTML;
+		overallTextDiv.innerText = sanitize(overall);
 		avgGradeTitleDiv.innerText = 'Average Grade';
-		avgGradeTextDiv.innerText = avgGrade.innerHTML;
+		avgGradeTextDiv.innerText = sanitize(avgGrade);
 		helpfulnessTitleDiv.innerText = 'Helpfulness';
-		helpfulnessTextDiv.innerText = helpfulness.innerHTML;
+		helpfulnessTextDiv.innerText = sanitize(helpfulness);
 		clarityTitleDiv.innerText = 'Clarity';
-		clarityTextDiv.innerText = clarity.innerHTML;
+		clarityTextDiv.innerText = sanitize(clarity);
 		easinessTitleDiv.innerText = 'Easiness';
-		easinessTextDiv.innerText = easiness.innerHTML;
+		easinessTextDiv.innerText = sanitize(easiness);
 
-		numRatings = numRatings.slice(9).split(' ')[0] //check to see if "ratings" is singular or plural
 		if (numRatings == '1') {
-		    numRatingsDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + numRatings + ' rating</a>';
+			numRatingsDiv.innerHTML = '<a href="' + sanitizeURL(this.profURL) + '" target="_blank">' + sanitize(numRatings) + ' rating</a>';
 		} else {
-		    numRatingsDiv.innerHTML = '<a href="' + this.profURL + '" target="_blank">' + numRatings + ' ratings</a>';
+			numRatingsDiv.innerHTML = '<a href="' + sanitizeURL(this.profURL) + '" target="_blank">' + sanitize(numRatings) + ' ratings</a>';
 		}
 
-		//add divs to popup
-		popup.innerHTML = ''; //remove 'loading...' text
+		// remove 'Loading...' text
+		popup.innerHTML = popup.innerHTML.replace('Loading...','');
 
+		//add divs to popup
 		overallTitleDiv.appendChild(overallTextDiv);
 		overallDiv.appendChild(overallTitleDiv);
 		avgGradeTitleDiv.appendChild(avgGradeTextDiv);
@@ -344,8 +360,40 @@ function parseProfessorResponseHTML(messageEvent) {
 	 }
 }
 
+function notFound(index) {
+	var popup = popupcontexts[index][0];
+	var fullname = popupcontexts[index][3];
+	var emptyPopup        = popup;
+	emptyPopup.className  = 'notFoundPopup';
+	var profNameDiv       = document.createElement('div');
+	var idk               = document.createElement('div');  
+	profNameDiv.className = 'heading';
+	idk.className         = 'idk';
+	profNameDiv.innerText = sanitize(fullname);
+	idk.innerHTML         = "Professor not found on RateMyProfessors.<br /><br />¯\\_(ツ)_/¯";
+	emptyPopup.innerHTML  = '';
+	emptyPopup.appendChild(profNameDiv);
+	emptyPopup.appendChild(idk);
+}
+
+function handleErrorFromRequest(messageEvent) {
+	if (messageEvent.name == "requestError") {
+		var index = messageEvent.message[0];
+		var popup = popupcontexts[index][0];
+		if (popup.childNodes.length <= 1) { 
+			popup.removeChild(popup.lastChild);
+			popup.className = "popup error";
+			var errorDiv = document.createElement("div");
+			errorDiv.className = "centerError";
+			errorDiv.innerText = "Load failed.";
+			popup.appendChild(errorDiv);
+		}
+	}
+}
+
 safari.self.addEventListener("message", parseMyEduSchoolResponseHTML, false);
 safari.self.addEventListener("message", parseMyEduDepartmentResponseHTML, false);
 safari.self.addEventListener("message", parseMyEduCourseResponseHTML, false);
 safari.self.addEventListener("message", parseProfessorResponseHTML, false);
 safari.self.addEventListener("message", parseSearchResponseHTML, false);
+safari.self.addEventListener("message", handleErrorFromRequest, false);
