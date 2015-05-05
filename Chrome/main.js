@@ -11,45 +11,43 @@ function main()
 	
   	for (var i = 3; i < length; i += 18)                   		 //only iterate through cells which contain a professor name	
   	{
-		var profName = cells[i].innerText.slice(0,-1);           //slice '&nbsp;'' character		
+		  var profName = cells[i].innerText.slice(0,-1);           //slice '&nbsp;'' character		
 		
-    	if (profName != 'T.B.A.' && profName != 'Cancel'){
-		  	professors.push(profName.slice(0,-1));               //slice remaining space at end & push to professor array
-			var div         = cells[i+9];                        //cell where the button will go
-			var searchName  = '';
-			var nameArray   = professors[profCount].split(' ');  //check if professor's last name is two words to include in search
-      	if (nameArray.length == 1)                          	 //special case for single name on gold
-      	{
-			searchName    = nameArray[0];
-			div.firstName = ' ';
-		}
-		else if (nameArray[1].length > 1)
-		{ 
-			searchName = nameArray[0] + ' ' + nameArray[1];
-        	if (nameArray.length == 2)                        	 //when first name isnt provided, make it blank and check it later
-        	{
-          		div.firstName = ' ';
-        	} 
-        	else
-        	{
-				div.firstName = nameArray[2];
-        	}
-		}
-		else
-      	{ 
-			searchName    = nameArray[0]; 
-			div.firstName = nameArray[1];
-		}
+    	if (profName != 'T.B.A.' && profName != 'Cancel')
+      {
+		    professors.push(profName.slice(0,-1));               //slice remaining space at end & push to professor array
+        var div         = cells[i+9];                        //cell where the button will go
+        var searchName  = '';
+        var nameArray   = professors[profCount].split(' ');  //check if professor's last name is two words to include in search
+      	if (nameArray.length == 1){                         	 //special case for single name on gold
+          searchName    = nameArray[0];
+          div.firstName = ' ';
+		    }
+		    else if (nameArray[1].length > 1)
+		    { 
+          searchName = nameArray[0] + ' ' + nameArray[1];
+          if (nameArray.length == 2){                       	 //when first name isnt provided, make it blank and check it later
+            div.firstName = ' ';
+          } 
+          else {
+            div.firstName = nameArray[2];
+          }
+        }
+		    else
+        { 
+          searchName    = nameArray[0]; 
+          div.firstName = nameArray[1];
+		    }
 
-		div.searchURL = 'http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=university+of+california+santa+barbara&queryoption=HEADER&query=' + searchName + '&facetSearch=true';
-		div.profURL   = '';
-		div.innerHTML = '<input class="ratingButton" type="button" value="SHOW RATING" />';
-		div.cell      = cells[i+10];                          //cell where the popup's html will be placed
-		div.clicked   = false;
-		div.addEventListener('click', openPopup);
-		profCount++;
-		}
-	}
+		    div.searchURL = 'http://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=university+of+california+santa+barbara&queryoption=HEADER&query=' + searchName + '&facetSearch=true';
+		    div.profURL   = '';
+		    div.innerHTML = '<input class="ratingButton" type="button" value="SHOW RATING" />';
+        div.cell      = cells[i+10];                          //cell where the popup's html will be placed
+        div.clicked   = false;
+        div.addEventListener('click', openPopup);
+        profCount++;
+		  }
+	 }
 }
 
 function openPopup() 
@@ -83,19 +81,19 @@ function processFirstRequest(popup, firstName, responseText)
 	var foundProfs = tmp.getElementsByClassName('listing PROFESSOR'); 
         
 	if (foundProfs.length == 0)                     //if no results were returned, print this message
-	{
-		var emptyPopup = popup;
-   		emptyPopup.className = 'notFoundPopup';
-    	var notFound         = document.createElement('div');
-    	var idk              = document.createElement('div');  
-    	notFound.className   = 'heading';
-    	idk.className        = 'idk';
-    	notFound.innerText   = "Professor not found";
-    	idk.innerText        = "¯\\_(ツ)_/¯";   
-    	emptyPopup.innerHTML = '';
-    	emptyPopup.appendChild(notFound);
-    	emptyPopup.appendChild(idk);
-  	}
+  {
+    var emptyPopup = popup;
+    emptyPopup.className = 'notFoundPopup';
+    var notFound         = document.createElement('div');
+    var idk              = document.createElement('div');  
+    notFound.className   = 'heading';
+    idk.className        = 'idk';
+    notFound.innerText   = "Professor not found";
+    idk.innerText        = "¯\\_(ツ)_/¯";   
+    emptyPopup.innerHTML = '';
+    emptyPopup.appendChild(notFound);
+    emptyPopup.appendChild(idk);
+  }
   	else //iterate through the search results and match by first letter of first name to verify identity
   	{
 	    var length = foundProfs.length;
@@ -108,22 +106,22 @@ function processFirstRequest(popup, firstName, responseText)
 
     		if ((firstName.charAt(0) == name.split(',')[1].charAt(1)) || (firstName == ' '))
     		{ 
-				break;
-			}
+				  break;
+        }
     		else if (i == length-1) 
     		{
-				var emptyPopup       = popup;
-				emptyPopup.className = 'notFoundPopup';
-				var notFound         = document.createElement('div');
-				var idk              = document.createElement('div');  
-				notFound.className   = 'heading';
-				idk.className        = 'idk';
-				notFound.innerText   = "Professor not found";
-				idk.innerText        = "¯\\_(ツ)_/¯";
-				emptyPopup.innerHTML = '';
-				emptyPopup.appendChild(notFound);
-				emptyPopup.appendChild(idk);
-				return 0;
+  				var emptyPopup       = popup;
+  				emptyPopup.className = 'notFoundPopup';
+  				var notFound         = document.createElement('div');
+  				var idk              = document.createElement('div');  
+  				notFound.className   = 'heading';
+  				idk.className        = 'idk';
+  				notFound.innerText   = "Professor not found";
+  				idk.innerText        = "¯\\_(ツ)_/¯";
+  				emptyPopup.innerHTML = '';
+  				emptyPopup.appendChild(notFound);
+  				emptyPopup.appendChild(idk);
+  				return 0;
     		}
   		}
 
@@ -140,7 +138,7 @@ function processFirstRequest(popup, firstName, responseText)
 //function that adds content to popup
 function addContentToPopUp(popup, profURL,responseText) 
 {
-	var tmp               = document.createElement('div');
+    var tmp           = document.createElement('div');
   	tmp.innerHTML     = responseText;
   	var proffName     = tmp.getElementsByClassName('pfname')[0].innerText;
   	var proflName     = tmp.getElementsByClassName('plname')[0].innerText;
@@ -218,7 +216,7 @@ function addContentToPopUp(popup, profURL,responseText)
   	}
   	else
   	{
-  	numRatingsDiv.innerHTML     = '<a href="'+ profURL + '" target="_blank">'+ numRatings + ' ratings</a>';
+      numRatingsDiv.innerHTML     = '<a href="'+ profURL + '" target="_blank">'+ numRatings + ' ratings</a>';
   	}
 
   	//add divs to popup
