@@ -68,7 +68,10 @@ function openPopup()
 		this.cell.appendChild(popup);
 
 		chrome.runtime.sendMessage({ url: this.searchURL}, function(responseText) {
-      		processFirstRequest(popup, firstName,responseText);
+        responseText = responseText.replace('http://blog.ratemyprofessors.com/wp-content/uploads/2015/01/WNOs6.5_RMP_72x72.jpg', '');
+        responseText = responseText.replace('/assets/chilis/warm-chili.png', '');
+        responseText = responseText.replace('/assets/chilis/cold-chili.png', '');
+      	processFirstRequest(popup, firstName,responseText);
 		});
 	}
 }
@@ -126,10 +129,13 @@ function processFirstRequest(popup, firstName, responseText)
   		}
 
     //get the link for the actual professor page
-	var link     = tmp.getElementsByTagName('a');
+    var link     = tmp.getElementsByTagName('a');
     profURL = 'http://www.ratemyprofessors.com/' + link[0].toString().slice(23); //this is the URL
 
     chrome.runtime.sendMessage({ url: this.profURL }, function(responseText){
+      responseText = responseText.replace('http://blog.ratemyprofessors.com/wp-content/uploads/2015/01/WNOs6.5_RMP_72x72.jpg', '');
+      responseText = responseText.replace('/assets/chilis/warm-chili.png', '');
+      responseText = responseText.replace('/assets/chilis/cold-chili.png', '');
     	addContentToPopUp(popup, profURL, responseText);
     });
   }
